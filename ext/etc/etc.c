@@ -237,7 +237,7 @@ etc_getpwuid(int argc, VALUE *argv, VALUE obj)
 	uid = getuid();
     }
     pwd = getpwuid(uid);
-    if (pwd == 0) rb_raise(rb_eArgError, "can't find user for %d", (int)uid);
+    if (pwd == 0) rb_raise(rb_eArgError, "can't find user for %"PRIsVALUE, UIDT2NUM(uid));
     return setup_passwd(pwd);
 #else
     return Qnil;
@@ -490,7 +490,7 @@ etc_getgrgid(int argc, VALUE *argv, VALUE obj)
 	gid = getgid();
     }
     grp = getgrgid(gid);
-    if (grp == 0) rb_raise(rb_eArgError, "can't find group for %d", (int)gid);
+    if (grp == 0) rb_raise(rb_eArgError, "can't find group for %"PRIsVALUE, GIDT2NUM(gid));
     return setup_group(grp);
 #else
     return Qnil;

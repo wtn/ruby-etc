@@ -46,6 +46,20 @@ class TestEtc < Test::Unit::TestCase
     end
   end unless RUBY_PLATFORM.include?("android")
 
+  def test_getpwuid_error_message_with_large_uid
+    uid = (2**32 - 16...2**32 - 1).find do |id|
+      Etc.getpwuid(id)
+      false
+    rescue ArgumentError
+      true
+    rescue RangeError
+      false
+    end
+    omit "no unassigned uid found" unless uid
+    e = assert_raise(ArgumentError) { Etc.getpwuid(uid) }
+    assert_equal("can't find user for #{uid}", e.message)
+  end unless RUBY_PLATFORM.include?("android") || /mswin|mingw/ =~ RUBY_PLATFORM
+
   def test_getpwnam
     passwd = {}
     Etc.passwd do |s|
@@ -95,6 +109,20 @@ class TestEtc < Test::Unit::TestCase
       assert_include(s, [g.name, g.gid])
     end
   end
+
+  def test_getgrgid_error_message_with_large_gid
+    gid = (2**32 - 16...2**32 - 1).find do |id|
+      Etc.getgrgid(id)
+      false
+    rescue ArgumentError
+      true
+    rescue RangeError
+      false
+    end
+    omit "no unassigned gid found" unless gid
+    e = assert_raise(ArgumentError) { Etc.getgrgid(gid) }
+    assert_equal("can't find group for #{gid}", e.message)
+  end unless /mswin|mingw/ =~ RUBY_PLATFORM
 
   def test_getgrnam
     groups = Hash.new {[]}
